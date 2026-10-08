@@ -1,8 +1,24 @@
-//Create an apiSimulator.ts file:
+// Create an apiSimulator.ts file
 
-//This file will contain functions that simulate API requests using Promises.
-//Each function should return a Promise that resolves with mock data after a delay, or rejects with an error message.
+// Custom Error Classes
 
+// Network errors
+export class NetworkError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = "NetworkError";
+    }
+}
+
+// Data errors
+export class DataError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = "DataError";
+    }
+}
+
+// Fetch Product Catalog
 export const fetchProductCatalog = (): Promise<
     { id: number; name: string; price: number }[]
 > => {
@@ -13,7 +29,7 @@ export const fetchProductCatalog = (): Promise<
 
             if (Math.random() < 0.8) {
 
-                resolve([
+                const products = [
                     {
                         id: 1,
                         name: "Iphone",
@@ -24,25 +40,38 @@ export const fetchProductCatalog = (): Promise<
                         name: "Samsung",
                         price: 200
                     }
-                ]);
+                ];
+
+                // Check product data
+                if (products.some((product) => !product.name)) {
+                    throw new DataError("Product name is missing");
+                }
+
+                resolve(products);
 
             } else {
 
-                reject("Failed to fetch product catalog");
+                reject(
+                    new NetworkError(
+                        "Failed to fetch product catalog"
+                    )
+                );
 
             }
 
         }, 1000);
     });
 };
-//fetchProductReviews(productId: number): Simulates fetching reviews for a product.
-//Resolve the Promise with an array of reviews after a 1.5-second delay.
-//Reject the Promise randomly with an error message, e.g., "Failed to fetch reviews for product ID ${productId}".
 
-
+//  Product Reviews
 export const fetchProductReviews = (
     productId: number
-): Promise<{ id: number; productId: number; reviewer: string; comment: string }[]> => {
+): Promise<{
+    id: number;
+    productId: number;
+    reviewer: string;
+    comment: string;
+}[]> => {
 
     return new Promise((resolve, reject) => {
 
@@ -67,7 +96,11 @@ export const fetchProductReviews = (
 
             } else {
 
-                reject(`Failed to fetch reviews for product ID ${productId}`);
+                reject(
+                    new NetworkError(
+                        `Failed to fetch reviews for product ID ${productId}`
+                    )
+                );
 
             }
 
@@ -75,10 +108,7 @@ export const fetchProductReviews = (
     });
 };
 
-//fetchSalesReport(): Simulates fetching a sales report with totalSales, unitsSold, and averagePrice.
-//Resolve the Promise with a mock sales report after a 1-second delay.
-//Reject randomly with an error message, e.g., "Failed to fetch sales report".
-
+//  Sales Report
 export const fetchSalesReport = (): Promise<{
     totalSales: number;
     unitsSold: number;
@@ -99,7 +129,11 @@ export const fetchSalesReport = (): Promise<{
 
             } else {
 
-                reject("Failed to fetch sales report");
+                reject(
+                    new NetworkError(
+                        "Failed to fetch sales report"
+                    )
+                );
 
             }
 
